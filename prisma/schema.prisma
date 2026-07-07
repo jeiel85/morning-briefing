@@ -64,7 +64,6 @@ model User {
   email             String?            @unique
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
-  emailSubscription Boolean            @default(false)
   unsubscribedAt    DateTime?
   preferences       UserPreference?
   briefings         Briefing[]
@@ -84,7 +83,6 @@ model UserPreference {
   categories           String[]
   interestKeywords     String[]
   blockedKeywords      String[]
-  emailEnabled         Boolean      @default(true)
   pushEnabled          Boolean      @default(false)
   urgentAlertsEnabled  Boolean      @default(false)
   createdAt            DateTime     @default(now())

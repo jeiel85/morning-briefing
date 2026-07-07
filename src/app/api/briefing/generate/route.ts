@@ -121,7 +121,7 @@ export async function POST(request: Request) {
         rank: i + 1,
         finalScore: score,
         title: cluster.title,
-        status: "developing",
+        status: clusterRec.status,
         summaryBullets: summary.summaryBullets,
         whyItMatters: summary.whyItMatters,
         confirmedFacts: summary.confirmedFacts,
