@@ -1,31 +1,30 @@
-import { ensureVisitor } from "@/lib/visitor";
+import { getVisitor } from "@/lib/visitor";
 import { prisma } from "@/lib/db";
-import { generateBriefing, saveFeedback } from "@/lib/actions";
+import { saveFeedback } from "@/lib/actions";
+import { GenerateButton } from "@/components/GenerateButton";
 import { getTranslations } from "next-intl/server";
 
 export default async function DashboardPage() {
-  const user = await ensureVisitor();
+  const user = await getVisitor();
   const t = await getTranslations("dashboard");
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const briefing = await prisma.briefing.findFirst({
-    where: { userId: user.id, briefingDate: { gte: today } },
-    include: { items: { orderBy: { rank: "asc" } } },
-    orderBy: { createdAt: "desc" },
-  });
+  let briefing = null;
+  if (user) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    briefing = await prisma.briefing.findFirst({
+      where: { userId: user.id, briefingDate: { gte: today } },
+      include: { items: { orderBy: { rank: "asc" } } },
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
   if (!briefing || briefing.items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <h1 className="mb-2 text-2xl font-bold">{t("title")}</h1>
         <p className="mb-8 text-neutral-500">{t("empty")}</p>
-        <form action={generateBriefing}>
-          <button type="submit" className="rounded-lg bg-neutral-900 px-8 py-3 text-sm font-medium text-white hover:bg-neutral-800">
-            {t("generate")}
-          </button>
-        </form>
+        <GenerateButton label={t("generate")} />
       </div>
     );
   }

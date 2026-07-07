@@ -15,7 +15,6 @@ const preferencesSchema = z.object({
   inactiveWindowStart: timeStringSchema,
   inactiveWindowEnd: timeStringSchema,
   briefingDeliveryTime: timeStringSchema,
-  emailEnabled: z.coerce.boolean(),
   pushEnabled: z.coerce.boolean(),
   urgentAlertsEnabled: z.coerce.boolean(),
   categories: z.array(z.string()).default([]),
@@ -99,6 +98,11 @@ export async function generateBriefing() {
     const title = item.title.toLowerCase();
     return !blockedKeywords.some((kw) => title.includes(kw.toLowerCase()));
   });
+
+  if (filtered.length === 0) {
+    revalidatePath("/app");
+    redirect("/app");
+  }
 
   const clusters = buildClusters(filtered);
   const maxItems = mode === "three_minute" ? 5 : mode === "ten_minute" ? 10 : 20;

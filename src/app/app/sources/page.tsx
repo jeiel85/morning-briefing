@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { ensureVisitor } from "@/lib/visitor";
+import { getVisitor } from "@/lib/visitor";
 import { getTranslations } from "next-intl/server";
 
 async function toggleSource(formData: FormData) {
@@ -12,7 +12,7 @@ async function toggleSource(formData: FormData) {
 }
 
 export default async function SourcesPage() {
-  await ensureVisitor();
+  await getVisitor();
   const t = await getTranslations("sources");
 
   const sources = await prisma.source.findMany({ orderBy: { key: "asc" } });

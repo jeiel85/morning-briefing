@@ -1,6 +1,7 @@
-import { ensureVisitor } from "@/lib/visitor";
+import { getVisitor } from "@/lib/visitor";
 import { redirect } from "next/navigation";
-import { savePreferences, getPreferences } from "@/lib/actions";
+import { savePreferences } from "@/lib/actions";
+import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 
 const TIMEZONES = Intl.supportedValuesOf?.("timeZone") ?? [
@@ -15,9 +16,9 @@ const CATEGORIES = [
 ];
 
 export default async function SettingsPage() {
-  await ensureVisitor();
+  const user = await getVisitor();
   const t = await getTranslations("settings");
-  const prefs = await getPreferences();
+  const prefs = user ? await prisma.userPreference.findUnique({ where: { userId: user.id } }) : null;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -79,10 +80,6 @@ export default async function SettingsPage() {
         <section className="rounded-lg border border-neutral-200 p-6">
           <h2 className="mb-4 text-lg font-semibold">{t("delivery")}</h2>
           <div className="space-y-3">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" name="emailEnabled" defaultChecked={prefs?.emailEnabled ?? true} />
-              <span className="text-sm">{t("email_enabled")}</span>
-            </label>
             <label className="flex items-center gap-2">
               <input type="checkbox" name="pushEnabled" defaultChecked={prefs?.pushEnabled ?? false} />
               <span className="text-sm">{t("push_enabled")}</span>

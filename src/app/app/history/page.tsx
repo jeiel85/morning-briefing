@@ -1,17 +1,19 @@
-import { ensureVisitor } from "@/lib/visitor";
+import { getVisitor } from "@/lib/visitor";
 import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
 
 export default async function HistoryPage() {
-  const user = await ensureVisitor();
+  const user = await getVisitor();
   const t = await getTranslations("history");
 
-  const briefings = await prisma.briefing.findMany({
-    where: { userId: user.id },
-    include: { _count: { select: { items: true } } },
-    orderBy: { briefingDate: "desc" },
-    take: 50,
-  });
+  const briefings = user
+    ? await prisma.briefing.findMany({
+        where: { userId: user.id },
+        include: { _count: { select: { items: true } } },
+        orderBy: { briefingDate: "desc" },
+        take: 50,
+      })
+    : [];
 
   return (
     <div>

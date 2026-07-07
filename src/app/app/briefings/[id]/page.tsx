@@ -1,10 +1,11 @@
-import { ensureVisitor } from "@/lib/visitor";
+import { getVisitor } from "@/lib/visitor";
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 export default async function BriefingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const user = await ensureVisitor();
+  const user = await getVisitor();
+  if (!user) notFound();
   const t = await getTranslations("history");
 
   const { id } = await params;
