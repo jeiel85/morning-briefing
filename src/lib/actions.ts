@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { ensureVisitor } from "@/lib/visitor";
 import { timeStringSchema } from "@/lib/schedule";
 import { buildClusters } from "@/lib/clustering";
@@ -15,6 +16,7 @@ const preferencesSchema = z.object({
   inactiveWindowStart: timeStringSchema,
   inactiveWindowEnd: timeStringSchema,
   briefingDeliveryTime: timeStringSchema,
+  briefingMode: z.enum(["three_minute", "ten_minute", "full", "developer", "global"]).default("three_minute"),
   pushEnabled: z.coerce.boolean(),
   urgentAlertsEnabled: z.coerce.boolean(),
   categories: z.array(z.string()).default([]),
@@ -35,8 +37,8 @@ export async function savePreferences(formData: FormData) {
 
   await prisma.userPreference.upsert({
     where: { userId: user.id },
-    update: parsed,
-    create: { userId: user.id, ...parsed },
+    update: parsed as Prisma.UserPreferenceUpdateInput,
+    create: { userId: user.id, ...parsed } as Prisma.UserPreferenceUncheckedCreateInput,
   });
 
   revalidatePath("/app/settings");

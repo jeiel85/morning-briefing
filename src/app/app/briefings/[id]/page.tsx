@@ -41,6 +41,12 @@ export default async function BriefingDetailPage({ params }: { params: Promise<{
         <p className="text-sm text-neutral-500">
           {briefing.briefingDate.toLocaleDateString()} · {briefing.mode.replace("_", " ")}
         </p>
+        {briefing.summary && (
+          <p className="mt-2 text-sm text-neutral-600">{briefing.summary}</p>
+        )}
+        {briefing.coverageNote && (
+          <p className="mt-1 text-xs italic text-neutral-400">{briefing.coverageNote}</p>
+        )}
       </div>
 
       <div className="space-y-4">

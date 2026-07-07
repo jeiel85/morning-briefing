@@ -1,8 +1,18 @@
 import { getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/db";
 import Link from "next/link";
 
 export default async function Home() {
   const t = await getTranslations("landing");
+
+  let stats: { users: number; briefings: number } | null = null;
+  try {
+    const [users, briefings] = await Promise.all([
+      prisma.user.count(),
+      prisma.briefing.count(),
+    ]);
+    stats = { users, briefings };
+  } catch {}
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -31,12 +41,18 @@ export default async function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-neutral-200 py-4 text-center text-xs text-neutral-400">
+      <footer className="flex items-center justify-center gap-4 border-t border-neutral-200 py-4 text-xs text-neutral-400">
         <Link href="/privacy" className="hover:text-neutral-600">Privacy</Link>
-        <span className="mx-2">·</span>
+        <span>·</span>
         <Link href="/terms" className="hover:text-neutral-600">Terms</Link>
-        <span className="mx-2">·</span>
+        <span>·</span>
         <a href="https://github.com/jeiel85/morning-briefing" className="hover:text-neutral-600" target="_blank" rel="noopener noreferrer">GitHub</a>
+        {stats && (
+          <>
+            <span>·</span>
+            <span>{stats.users} users · {stats.briefings} briefings</span>
+          </>
+        )}
       </footer>
     </div>
   );

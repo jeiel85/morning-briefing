@@ -2,6 +2,10 @@ name: ingestion
 on:
   schedule:
     - cron: "0 */4 * * *"
+    - cron: "0 5 * * *"
+    - cron: "0 10 * * *"
+    - cron: "0 14 * * *"
+    - cron: "0 18 * * *"
   workflow_dispatch:
 
 jobs:
@@ -13,3 +17,9 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.INTERNAL_JOB_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d "{}"
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s "https://zam-dun.vercel.app/api/maintenance/cleanup" \
+            -H "Authorization: Bearer ${{ secrets.INTERNAL_JOB_TOKEN }}"

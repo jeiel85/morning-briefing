@@ -91,6 +91,18 @@ export default async function SettingsPage() {
         </section>
 
         <section className="rounded-lg border border-neutral-200 p-6">
+          <h2 className="mb-4 text-lg font-semibold">{t("briefing_mode")}</h2>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {(["three_minute", "ten_minute", "full", "developer", "global"] as const).map((mode) => (
+              <label key={mode} className="flex items-center gap-2 rounded border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50">
+                <input type="radio" name="briefingMode" value={mode} defaultChecked={(prefs?.briefingMode ?? "three_minute") === mode} />
+                {t(`mode_${mode}`)}
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-neutral-200 p-6">
           <h2 className="mb-4 text-lg font-semibold">{t("topics")}</h2>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
