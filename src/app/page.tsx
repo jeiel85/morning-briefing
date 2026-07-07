@@ -5,7 +5,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-24 text-center">
-      <h1 className="mb-4 text-5xl font-bold tracking-tight">{t("title")}</h1>
+      <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">{t("title")}</h1>
       <p className="mb-10 text-lg text-neutral-600">{t("subtitle")}</p>
       <a
         href="/auth/signin"

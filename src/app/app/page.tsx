@@ -34,7 +34,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-3xl px-4">
       <div className="mb-8 flex items-end justify-between border-b border-neutral-200 pb-4">
         <div>
           <h1 className="text-2xl font-bold">{briefing.title}</h1>
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
 
       <div className="space-y-5">
         {briefing.items.map((item) => (
-          <article key={item.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <article key={item.id} className="rounded-xl border border-neutral-200 bg-white p-4 shadow-sm md:p-6">
             <div className="mb-3 flex items-center gap-3 text-xs">
               <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 font-medium text-neutral-600">
                 {item.section}

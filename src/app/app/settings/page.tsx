@@ -28,7 +28,7 @@ export default async function SettingsPage() {
       <form action={savePreferences} className="space-y-8">
         <section className="rounded-lg border border-neutral-200 p-6">
           <h2 className="mb-4 text-lg font-semibold">{t("schedule")}</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium">{t("timezone")}</label>
               <select name="timezone" defaultValue={prefs?.timezone ?? "Asia/Seoul"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm">
