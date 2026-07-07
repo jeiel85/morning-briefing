@@ -1,0 +1,85 @@
+{
+  "landing": {
+    "title": "DawnBrief",
+    "subtitle": "매일 아침 당신만의 브리핑을 준비하세요.",
+    "start": "시작하기"
+  },
+  "auth": {
+    "signin_title": "DawnBrief 로그인",
+    "email_placeholder": "you@example.com",
+    "signin_button": "이메일로 로그인"
+  },
+  "app": {
+    "today": "오늘의 브리핑",
+    "history": "기록",
+    "settings": "설정",
+    "sources": "소스",
+    "privacy": "개인정보",
+    "terms": "이용약관",
+    "delete_account": "계정 삭제",
+    "signout": "로그아웃"
+  },
+  "dashboard": {
+    "title": "오늘의 브리핑",
+    "empty": "아직 브리핑이 없습니다.",
+    "generate": "지금 생성하기",
+    "items": "{count}개 항목",
+    "score": "점수",
+    "sources": "출처 ({count}개)",
+    "limited_notice": "AI 없이 요약된 항목입니다. 원문을 그대로 표시합니다.",
+    "feedback_useful": "👍",
+    "feedback_not_useful": "👎",
+    "feedback_duplicate": "중복",
+    "feedback_block_source": "이 소스 차단"
+  },
+  "history": {
+    "title": "브리핑 기록",
+    "empty": "아직 브리핑이 없습니다.",
+    "items": "{count}개 항목",
+    "back": "← 기록으로 돌아가기"
+  },
+  "settings": {
+    "title": "설정",
+    "schedule": "일정",
+    "timezone": "시간대",
+    "inactive_start": "비활성 시작",
+    "inactive_end": "비활성 종료",
+    "delivery_time": "전달 시간",
+    "topics": "관심 주제",
+    "keywords": "키워드",
+    "interest_keywords": "관심 키워드",
+    "interest_placeholder": "rust, typescript, nextjs",
+    "blocked_keywords": "차단 키워드",
+    "blocked_placeholder": "스포일러, 루머",
+    "delivery": "전달 방식",
+    "email_enabled": "이메일 브리핑",
+    "push_enabled": "푸시 알림",
+    "urgent_enabled": "긴급 알림",
+    "save": "설정 저장"
+  },
+  "sources": {
+    "title": "소스 관리"
+  },
+  "delete_account": {
+    "title": "계정 삭제",
+    "warning": "계정, 설정, 모든 브리핑 데이터가 영구 삭제됩니다. 되돌릴 수 없습니다.",
+    "button": "계정 삭제"
+  },
+  "privacy": {
+    "title": "개인정보 처리방침",
+    "content": [
+      "DawnBrief는 브리핑 전달에 필요한 최소한의 데이터만 수집합니다.",
+      "로그인 및 전달을 위한 이메일 주소, 사용자가 설정한 시간대/주제/키워드 등 환경설정, 생성된 브리핑 데이터가 이에 포함됩니다.",
+      "데이터를 제3자와 공유하지 않습니다. 광고를 게재하지 않습니다. 공개 RSS/API 피드에서 콘텐츠를 가져와 요약하며, 원문 전문을 저장하지 않습니다.",
+      "언제든지 계정을 삭제할 수 있으며, 모든 저장 데이터가 제거됩니다."
+    ]
+  },
+  "terms": {
+    "title": "이용약관",
+    "content": [
+      "DawnBrief는 \"있는 그대로\" 제공되며, 자동 생성된 브리핑에 오류가 포함될 수 있습니다.",
+      "브리핑을 참고한 결정에 대한 책임은 사용자에게 있습니다.",
+      "서비스는 예고 없이 중단될 수 있습니다. 언제든지 계정을 삭제할 수 있습니다."
+    ]
+  }
+}

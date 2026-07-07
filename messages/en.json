@@ -1,0 +1,85 @@
+{
+  "landing": {
+    "title": "DawnBrief",
+    "subtitle": "Your personal morning briefing. Coming soon.",
+    "start": "Get Started"
+  },
+  "auth": {
+    "signin_title": "Sign in to DawnBrief",
+    "email_placeholder": "you@example.com",
+    "signin_button": "Sign in with Email"
+  },
+  "app": {
+    "today": "Today's Briefing",
+    "history": "History",
+    "settings": "Settings",
+    "sources": "Sources",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "delete_account": "Delete account",
+    "signout": "Sign out"
+  },
+  "dashboard": {
+    "title": "Today's Briefing",
+    "empty": "Your morning digest is ready to brew.",
+    "generate": "Generate Now",
+    "items": "{count} items",
+    "score": "Score",
+    "sources": "Sources ({count})",
+    "limited_notice": "This item was summarized without AI. Source text is shown as-is.",
+    "feedback_useful": "👍",
+    "feedback_not_useful": "👎",
+    "feedback_duplicate": "duplicate",
+    "feedback_block_source": "block source"
+  },
+  "history": {
+    "title": "Briefing History",
+    "empty": "No briefings yet.",
+    "items": "{count} items",
+    "back": "← Back to history"
+  },
+  "settings": {
+    "title": "Settings",
+    "schedule": "Schedule",
+    "timezone": "Timezone",
+    "inactive_start": "Inactive window start",
+    "inactive_end": "Inactive window end",
+    "delivery_time": "Delivery time",
+    "topics": "Topics",
+    "keywords": "Keywords",
+    "interest_keywords": "Interest keywords",
+    "interest_placeholder": "rust, typescript, nextjs",
+    "blocked_keywords": "Blocked keywords",
+    "blocked_placeholder": "spoiler, gossip",
+    "delivery": "Delivery",
+    "email_enabled": "Email briefing",
+    "push_enabled": "Push notifications",
+    "urgent_enabled": "Urgent alerts",
+    "save": "Save Settings"
+  },
+  "sources": {
+    "title": "Source Settings"
+  },
+  "delete_account": {
+    "title": "Delete Account",
+    "warning": "This will permanently delete your account, preferences, and all briefing data. This action cannot be undone.",
+    "button": "Delete My Account"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "content": [
+      "DawnBrief collects and stores only the data necessary to deliver your morning briefing.",
+      "Account data — email address for login and delivery. Preferences — timezone, schedule, topics, and keyword filters you explicitly set. Briefing data — generated summaries are stored temporarily and linked to your account.",
+      "We do not sell your data. We do not serve ads. Source content is fetched from public RSS/API feeds and summarized; full article text is not stored.",
+      "You can delete your account at any time, which removes all stored data."
+    ]
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "content": [
+      "DawnBrief is provided \"as is\" without warranty. The briefing is generated automatically from public sources and may contain inaccuracies.",
+      "You are responsible for your preferences and for any actions taken based on the briefing.",
+      "We reserve the right to discontinue the service at any time. You may delete your account at any time."
+    ]
+  }
+}

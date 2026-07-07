@@ -1,10 +1,13 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 export default async function HistoryPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
+
+  const t = await getTranslations("history");
 
   const briefings = await prisma.briefing.findMany({
     where: { userId: session.user.id },
@@ -15,9 +18,9 @@ export default async function HistoryPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">Briefing History</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
       {briefings.length === 0 ? (
-        <p className="text-neutral-600">No briefings yet.</p>
+        <p className="text-neutral-600">{t("empty")}</p>
       ) : (
         <div className="space-y-2">
           {briefings.map((b) => (
@@ -29,7 +32,7 @@ export default async function HistoryPage() {
               <div>
                 <p className="font-medium">{b.title}</p>
                 <p className="text-sm text-neutral-500">
-                  {b.briefingDate.toLocaleDateString()} · {b._count.items} items
+                  {b.briefingDate.toLocaleDateString()} · {t("items", { count: b._count.items })}
                 </p>
               </div>
               <span className="text-xs text-neutral-400">

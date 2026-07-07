@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 async function toggleSource(formData: FormData) {
   "use server";
@@ -17,11 +18,13 @@ export default async function SourcesPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
 
+  const t = await getTranslations("sources");
+
   const sources = await prisma.source.findMany({ orderBy: { key: "asc" } });
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="mb-8 text-2xl font-bold">Sources</h1>
+      <h1 className="mb-8 text-2xl font-bold">{t("title")}</h1>
       <div className="space-y-3">
         {sources.map((source) => (
           <form key={source.id} action={toggleSource} className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3">

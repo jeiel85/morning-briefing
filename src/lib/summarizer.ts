@@ -1,3 +1,5 @@
+import { translateBullets } from "./translate";
+
 export interface SummaryInput {
   title: string;
   category: string;
@@ -79,7 +81,7 @@ ${input.items.map((i) => `- ${i.sourceName}: ${i.title}${i.snippet ? ` — ${i.s
   }
 }
 
-function generateFallback(input: SummaryInput): SummaryResult {
+async function generateFallback(input: SummaryInput): Promise<SummaryResult> {
   const bullets = input.items.slice(0, 5).map((item) => {
     const preview = item.snippet
       ? item.snippet.replace(/<[^>]*>/g, "").slice(0, 120)
@@ -89,8 +91,10 @@ function generateFallback(input: SummaryInput): SummaryResult {
       : `${item.sourceName}: ${item.title}`;
   });
 
+  const translated = await translateBullets(bullets);
+
   return {
-    summaryBullets: bullets,
+    summaryBullets: translated,
     whyItMatters: undefined,
     confirmedFacts: [],
     uncertainties: [],

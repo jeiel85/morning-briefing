@@ -1,19 +1,33 @@
 import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const isOnApp = req.nextUrl.pathname.startsWith("/app");
-  const isOnAuth = req.nextUrl.pathname.startsWith("/auth");
+export default async function middleware(request: NextRequest) {
+  const acceptLang = request.headers.get("accept-language") || "";
+  const locale = acceptLang.startsWith("ko") ? "ko" : "en";
 
-  if (isOnApp && !isLoggedIn) {
-    return Response.redirect(new URL("/auth/signin", req.nextUrl));
+  const response = NextResponse.next();
+  response.cookies.set("NEXT_LOCALE", locale, {
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  const session = await auth();
+  const isOnApp = request.nextUrl.pathname.startsWith("/app");
+  const isOnAuth = request.nextUrl.pathname.startsWith("/auth");
+
+  if (isOnApp && !session) {
+    return Response.redirect(new URL("/auth/signin", request.nextUrl));
   }
 
-  if (isOnAuth && isLoggedIn) {
-    return Response.redirect(new URL("/app", req.nextUrl));
+  if (isOnAuth && session) {
+    return Response.redirect(new URL("/app", request.nextUrl));
   }
-});
+
+  return response;
+}
 
 export const config = {
-  matcher: ["/app/:path*", "/auth/:path*"],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

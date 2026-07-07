@@ -1,10 +1,13 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 export default async function BriefingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/auth/signin");
+
+  const t = await getTranslations("history");
 
   const { id } = await params;
 
@@ -18,7 +21,7 @@ export default async function BriefingDetailPage({ params }: { params: Promise<{
   return (
     <div>
       <a href="/app/history" className="mb-4 inline-block text-sm text-blue-600 hover:underline">
-        ← Back to history
+        {t("back")}
       </a>
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{briefing.title}</h1>
