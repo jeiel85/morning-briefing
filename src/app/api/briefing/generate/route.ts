@@ -1,60 +1,20 @@
-"use server";
-
-import { auth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { timeStringSchema } from "@/lib/schedule";
+import { auth } from "@/lib/auth";
 import { buildClusters } from "@/lib/clustering";
 import { calculateScore, calculateFreshness, calculateConsensus, calculateUrgency } from "@/lib/ranking";
 import { generateSummary } from "@/lib/summarizer";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { z } from "zod";
 
-const preferencesSchema = z.object({
-  timezone: z.string().min(1),
-  inactiveWindowStart: timeStringSchema,
-  inactiveWindowEnd: timeStringSchema,
-  briefingDeliveryTime: timeStringSchema,
-  emailEnabled: z.coerce.boolean(),
-  pushEnabled: z.coerce.boolean(),
-  urgentAlertsEnabled: z.coerce.boolean(),
-  categories: z.array(z.string()).default([]),
-  interestKeywords: z.string().transform((s) => s.split(",").map((k) => k.trim()).filter(Boolean)),
-  blockedKeywords: z.string().transform((s) => s.split(",").map((k) => k.trim()).filter(Boolean)),
-});
-
-export async function savePreferences(formData: FormData) {
+export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  const raw = Object.fromEntries(formData);
-  const parsed = preferencesSchema.parse(raw);
-
-  await prisma.userPreference.upsert({
-    where: { userId: session.user.id },
-    update: parsed,
-    create: { userId: session.user.id, ...parsed },
-  });
-
-  revalidatePath("/app/settings");
-}
-
-export async function getPreferences() {
-  const session = await auth();
-  if (!session?.user?.id) return null;
-
-  return prisma.userPreference.findUnique({
-    where: { userId: session.user.id },
-  });
-}
-
-export async function generateBriefing() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
+  const { windowStart, windowEnd } = await request.json();
   const now = new Date();
-  const wStart = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-  const wEnd = now;
+  const wStart = windowStart ? new Date(windowStart) : new Date(now.getTime() - 12 * 60 * 60 * 1000);
+  const wEnd = windowEnd ? new Date(windowEnd) : now;
 
   const prefs = await prisma.userPreference.findUnique({ where: { userId: session.user.id } });
   const blockedKeywords = prefs?.blockedKeywords ?? [];
@@ -107,6 +67,8 @@ export async function generateBriefing() {
     },
   });
 
+  const briefingItems = [];
+
   for (let i = 0; i < topClusters.length; i++) {
     const { cluster, score } = topClusters[i];
     const clusterRec = await prisma.topicCluster.create({
@@ -145,7 +107,7 @@ export async function generateBriefing() {
       })),
     });
 
-    await prisma.briefingItem.create({
+    const briefingItem = await prisma.briefingItem.create({
       data: {
         briefingId: briefing.id,
         clusterId: clusterRec.id,
@@ -165,9 +127,9 @@ export async function generateBriefing() {
         validationStatus: summary.validationStatus,
       },
     });
+
+    briefingItems.push(briefingItem);
   }
 
-  revalidatePath("/app");
-  revalidatePath("/app/history");
-  redirect("/app");
+  return NextResponse.json({ briefingId: briefing.id, itemCount: briefingItems.length });
 }
