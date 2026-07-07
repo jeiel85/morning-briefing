@@ -26,6 +26,7 @@
     "generate": "Generate Now",
     "items": "{count} items",
     "score": "Score",
+    "confidence": "Status: {status}",
     "sources": "Sources ({count})",
     "limited_notice": "This item was summarized without AI. Source text is shown as-is.",
     "feedback_useful": "👍",
@@ -54,6 +55,10 @@
     "blocked_placeholder": "spoiler, gossip",
     "delivery": "Delivery",
     "push_enabled": "Push notifications",
+    "push_status": "Push",
+    "push_subscribed": "Subscribed",
+    "push_not_subscribed": "Not subscribed",
+    "next_delivery": "Next delivery: {time}",
     "urgent_enabled": "Urgent alerts",
     "save": "Save Settings"
   },

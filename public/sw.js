@@ -7,6 +7,8 @@ self.addEventListener("push", (e) => {
     body: data.body,
     icon: "/icon.png",
     badge: "/badge.png",
+    tag: data.urgent ? "urgent" : "briefing",
+    renotify: data.urgent,
     data: { url: data.url ?? "/app" },
   });
 });

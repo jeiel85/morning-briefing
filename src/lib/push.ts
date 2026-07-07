@@ -13,6 +13,7 @@ export interface PushPayload {
   title: string;
   body: string;
   url?: string;
+  urgent?: boolean;
 }
 
 export async function sendPush(userId: string, payload: PushPayload) {
@@ -53,10 +54,12 @@ export async function sendPush(userId: string, payload: PushPayload) {
 export function renderPushPayload(
   briefingTitle: string,
   itemCount: number,
+  urgent?: boolean,
 ): PushPayload {
   return {
-    title: "zam-dun",
+    title: urgent ? "🔴 zam-dun · Urgent" : "zam-dun",
     body: `${briefingTitle} · ${itemCount} items ready`,
     url: "/app",
+    urgent,
   };
 }

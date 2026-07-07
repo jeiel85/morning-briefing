@@ -15,10 +15,46 @@ const CATEGORIES = [
   "science", "business", "world", "design", "open_source",
 ];
 
+function formatNextDelivery(timezone: string, deliveryTime: string): string {
+  try {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+    const currentLocal = `${get("year")}-${get("month")}-${get("day")}T${deliveryTime}:00`;
+    const next = new Date(currentLocal);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    return next.toLocaleString(undefined, {
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: timezone,
+    });
+  } catch {
+    return deliveryTime;
+  }
+}
+
 export default async function SettingsPage() {
   const user = await getVisitor();
+  if (!user) redirect("/");
   const t = await getTranslations("settings");
-  const prefs = user ? await prisma.userPreference.findUnique({ where: { userId: user.id } }) : null;
+  const [prefs, pushCount] = await Promise.all([
+    prisma.userPreference.findUnique({ where: { userId: user.id } }),
+    prisma.pushSubscription.count({ where: { userId: user.id, revokedAt: null } }),
+  ]);
+
+  const displayTime = prefs
+    ? formatNextDelivery(prefs.timezone, prefs.briefingDeliveryTime)
+    : null;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -49,6 +85,9 @@ export default async function SettingsPage() {
               <input type="time" name="briefingDeliveryTime" defaultValue={prefs?.briefingDeliveryTime ?? "07:05"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
             </div>
           </div>
+          {displayTime && (
+            <p className="mt-3 text-xs text-neutral-500">{t("next_delivery", { time: displayTime })}</p>
+          )}
         </section>
 
         <section className="rounded-lg border border-neutral-200 p-6">
@@ -80,6 +119,12 @@ export default async function SettingsPage() {
         <section className="rounded-lg border border-neutral-200 p-6">
           <h2 className="mb-4 text-lg font-semibold">{t("delivery")}</h2>
           <div className="space-y-3">
+            <div className="flex items-center justify-between rounded bg-neutral-50 px-3 py-2">
+              <span className="text-sm">{t("push_status")}</span>
+              <span className={`text-xs font-medium ${pushCount > 0 ? "text-green-600" : "text-neutral-400"}`}>
+                {pushCount > 0 ? t("push_subscribed") : t("push_not_subscribed")}
+              </span>
+            </div>
             <label className="flex items-center gap-2">
               <input type="checkbox" name="pushEnabled" defaultChecked={prefs?.pushEnabled ?? false} />
               <span className="text-sm">{t("push_enabled")}</span>

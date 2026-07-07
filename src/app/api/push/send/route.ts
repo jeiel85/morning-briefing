@@ -11,14 +11,15 @@ export async function POST(request: Request) {
   const { briefingId } = await request.json();
   const briefing = await prisma.briefing.findUnique({
     where: { id: briefingId },
-    include: { _count: { select: { items: true } } },
+    include: { items: { select: { finalScore: true } } },
   });
 
   if (!briefing) {
     return NextResponse.json({ error: "Briefing not found" }, { status: 404 });
   }
 
-  const payload = renderPushPayload(briefing.title, briefing._count.items);
+  const hasUrgent = briefing.items.some((i) => i.finalScore >= 0.9);
+  const payload = renderPushPayload(briefing.title, briefing.items.length, hasUrgent);
   const results = await sendPush(briefing.userId, payload);
 
   await prisma.deliveryLog.create({
@@ -31,5 +32,5 @@ export async function POST(request: Request) {
     },
   });
 
-  return NextResponse.json({ results });
+  return NextResponse.json({ results, urgent: hasUrgent });
 }
