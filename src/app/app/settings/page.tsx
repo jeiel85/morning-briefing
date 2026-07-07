@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { ensureVisitor } from "@/lib/visitor";
 import { redirect } from "next/navigation";
 import { savePreferences, getPreferences } from "@/lib/actions";
 import { getTranslations } from "next-intl/server";
@@ -15,9 +15,7 @@ const CATEGORIES = [
 ];
 
 export default async function SettingsPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin");
-
+  await ensureVisitor();
   const t = await getTranslations("settings");
   const prefs = await getPreferences();
 

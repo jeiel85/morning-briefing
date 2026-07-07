@@ -21,8 +21,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Briefing not found" }, { status: 404 });
   }
 
-  if (!briefing.user.preferences?.emailEnabled) {
-    return NextResponse.json({ status: "skipped", reason: "email disabled" });
+  if (!briefing.user.email || !briefing.user.preferences?.emailEnabled) {
+    return NextResponse.json({ status: "skipped", reason: "no email or disabled" });
   }
 
   const { html, text } = renderBriefingEmail(

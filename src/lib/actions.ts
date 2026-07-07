@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { ensureVisitor } from "@/lib/visitor";
 import { timeStringSchema } from "@/lib/schedule";
 import { buildClusters } from "@/lib/clustering";
 import { calculateScore, calculateFreshness, calculateConsensus, calculateUrgency } from "@/lib/ranking";
@@ -24,8 +24,7 @@ const preferencesSchema = z.object({
 });
 
 export async function savePreferences(formData: FormData) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  const user = await ensureVisitor();
 
   const raw: Record<string, unknown> = {};
   for (const key of formData.keys()) {
@@ -36,58 +35,53 @@ export async function savePreferences(formData: FormData) {
   const parsed = preferencesSchema.parse(raw);
 
   await prisma.userPreference.upsert({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
     update: parsed,
-    create: { userId: session.user.id, ...parsed },
+    create: { userId: user.id, ...parsed },
   });
 
   revalidatePath("/app/settings");
 }
 
 export async function saveFeedback(briefingItemId: string, type: string) {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  const user = await ensureVisitor();
 
   await prisma.feedback.create({
-    data: { userId: session.user.id, briefingItemId, type: type as any },
+    data: { userId: user.id, briefingItemId, type: type as any },
   });
 
   revalidatePath("/app");
 }
 
 export async function deleteAccount() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  const user = await ensureVisitor();
 
-  await prisma.user.delete({ where: { id: session.user.id } });
+  await prisma.user.delete({ where: { id: user.id } });
   redirect("/");
 }
 
 export async function getPreferences() {
-  const session = await auth();
-  if (!session?.user?.id) return null;
+  const user = await ensureVisitor();
 
   return prisma.userPreference.findUnique({
-    where: { userId: session.user.id },
+    where: { userId: user.id },
   });
 }
 
 export async function generateBriefing() {
-  const session = await auth();
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  const user = await ensureVisitor();
 
   const now = new Date();
   const wStart = new Date(now.getTime() - 12 * 60 * 60 * 1000);
   const wEnd = now;
 
-  // Remove any empty briefing for today so we can regenerate
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const existing = await prisma.briefing.findFirst({ where: { userId: session.user.id, briefingDate: { gte: today } }, include: { _count: { select: { items: true } } } });
+  const existing = await prisma.briefing.findFirst({ where: { userId: user.id, briefingDate: { gte: today } }, include: { _count: { select: { items: true } } } });
   if (existing && existing._count.items === 0) {
     await prisma.briefing.delete({ where: { id: existing.id } });
   }
 
-  const prefs = await prisma.userPreference.findUnique({ where: { userId: session.user.id } });
+  const prefs = await prisma.userPreference.findUnique({ where: { userId: user.id } });
   const blockedKeywords = prefs?.blockedKeywords ?? [];
   const interestKeywords = prefs?.interestKeywords ?? [];
   const mode = prefs?.briefingMode ?? "three_minute";
@@ -129,7 +123,7 @@ export async function generateBriefing() {
 
   const briefing = await prisma.briefing.create({
     data: {
-      userId: session.user.id,
+      userId: user.id,
       briefingDate: wEnd,
       windowStart: wStart,
       windowEnd: wEnd,

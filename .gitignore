@@ -10,3 +10,6 @@ next-env.d.ts
 dist/
 build/
 .turbo/
+
+.vercel
+.env*

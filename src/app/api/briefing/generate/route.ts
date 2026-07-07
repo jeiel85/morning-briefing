@@ -1,22 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { auth } from "@/lib/auth";
-import { buildClusters } from "@/lib/clustering";
-import { calculateScore, calculateFreshness, calculateConsensus, calculateUrgency } from "@/lib/ranking";
-import { generateSummary } from "@/lib/summarizer";
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) {
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.INTERNAL_JOB_TOKEN}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { windowStart, windowEnd } = await request.json();
+  const { userId, windowStart, windowEnd } = await request.json();
+  const id = userId;
+
+  if (!id) {
+    return NextResponse.json({ error: "userId required" }, { status: 400 });
+  }
+
   const now = new Date();
   const wStart = windowStart ? new Date(windowStart) : new Date(now.getTime() - 12 * 60 * 60 * 1000);
   const wEnd = windowEnd ? new Date(windowEnd) : now;
 
-  const prefs = await prisma.userPreference.findUnique({ where: { userId: session.user.id } });
+  const prefs = await prisma.userPreference.findUnique({ where: { userId: id } });
   const blockedKeywords = prefs?.blockedKeywords ?? [];
   const interestKeywords = prefs?.interestKeywords ?? [];
   const mode = prefs?.briefingMode ?? "three_minute";
@@ -35,7 +37,11 @@ export async function POST(request: Request) {
     return !blockedKeywords.some((kw) => title.includes(kw.toLowerCase()));
   });
 
+  const { buildClusters } = await import("@/lib/clustering");
   const clusters = buildClusters(filtered);
+  const { calculateScore, calculateFreshness, calculateConsensus, calculateUrgency } = await import("@/lib/ranking");
+  const { generateSummary } = await import("@/lib/summarizer");
+
   const maxItems = mode === "three_minute" ? 5 : mode === "ten_minute" ? 10 : 20;
 
   const ranked = clusters.map((c) => {
@@ -58,7 +64,7 @@ export async function POST(request: Request) {
 
   const briefing = await prisma.briefing.create({
     data: {
-      userId: session.user.id,
+      userId: id,
       briefingDate: wEnd,
       windowStart: wStart,
       windowEnd: wEnd,

@@ -1,13 +1,10 @@
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { ensureVisitor } from "@/lib/visitor";
 import { getTranslations } from "next-intl/server";
 
 async function toggleSource(formData: FormData) {
   "use server";
-  const session = await auth();
-  if (!session?.user?.id) return;
   const sourceId = formData.get("sourceId") as string;
   const enabled = formData.get("enabled") === "true";
   await prisma.source.update({ where: { id: sourceId }, data: { enabled } });
@@ -15,9 +12,7 @@ async function toggleSource(formData: FormData) {
 }
 
 export default async function SourcesPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin");
-
+  await ensureVisitor();
   const t = await getTranslations("sources");
 
   const sources = await prisma.source.findMany({ orderBy: { key: "asc" } });

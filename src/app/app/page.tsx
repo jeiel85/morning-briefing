@@ -1,20 +1,17 @@
-import { auth } from "@/lib/auth";
+import { ensureVisitor } from "@/lib/visitor";
 import { prisma } from "@/lib/db";
 import { generateBriefing, saveFeedback } from "@/lib/actions";
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin");
-
+  const user = await ensureVisitor();
   const t = await getTranslations("dashboard");
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const briefing = await prisma.briefing.findFirst({
-    where: { userId: session.user.id, briefingDate: { gte: today } },
+    where: { userId: user.id, briefingDate: { gte: today } },
     include: { items: { orderBy: { rank: "asc" } } },
     orderBy: { createdAt: "desc" },
   });

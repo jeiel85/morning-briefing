@@ -1,12 +1,7 @@
 import { deleteAccount } from "@/lib/actions";
-import { auth } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 export default async function DeleteAccountPage() {
-  const session = await auth();
-  if (!session?.user?.id) redirect("/auth/signin");
-
   const t = await getTranslations("delete_account");
 
   return (
