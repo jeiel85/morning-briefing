@@ -1,0 +1,15 @@
+name: ingestion
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -s -X POST "https://zam-dun.vercel.app/api/ingestion/fetch" \
+            -H "Authorization: Bearer ${{ secrets.INTERNAL_JOB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{}"

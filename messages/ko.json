@@ -2,7 +2,11 @@
   "landing": {
     "title": "잠든 사이",
     "subtitle": "잠든 사이, 세상은 움직입니다.",
-    "start": "시작하기"
+    "start": "시작하기",
+    "features_title": "일어나면 세상이 정리되어 있습니다",
+    "feature1": "좋아하는 RSS 소스를 구독하세요",
+    "feature2": "AI가 요약한 핵심만 — 간결하게, 한국어로",
+    "feature3": "푸시 알림으로 정해진 시간에 전송"
   },
   "auth": {
     "signin_title": "잠든 사이 로그인",

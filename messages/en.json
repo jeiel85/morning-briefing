@@ -1,8 +1,12 @@
 {
   "landing": {
     "title": "zam-dun",
-    "subtitle": "잠든 사이 — your personal morning briefing. Coming soon.",
-    "start": "Get Started"
+    "subtitle": "잠든 사이 — your personal morning briefing.",
+    "start": "Get Started",
+    "features_title": "Wake up informed",
+    "feature1": "Curated from your favorite RSS sources",
+    "feature2": "AI-powered summary — concise, multilingual",
+    "feature3": "Delivered via push notification on your schedule"
   },
   "auth": {
     "signin_title": "Sign in to zam-dun",
