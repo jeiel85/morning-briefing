@@ -80,6 +80,13 @@ export async function generateBriefing() {
   const wStart = new Date(now.getTime() - 12 * 60 * 60 * 1000);
   const wEnd = now;
 
+  // Remove any empty briefing for today so we can regenerate
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const existing = await prisma.briefing.findFirst({ where: { userId: session.user.id, briefingDate: { gte: today } }, include: { _count: { select: { items: true } } } });
+  if (existing && existing._count.items === 0) {
+    await prisma.briefing.delete({ where: { id: existing.id } });
+  }
+
   const prefs = await prisma.userPreference.findUnique({ where: { userId: session.user.id } });
   const blockedKeywords = prefs?.blockedKeywords ?? [];
   const interestKeywords = prefs?.interestKeywords ?? [];

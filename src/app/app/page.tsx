@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
-  if (!briefing) {
+  if (!briefing || briefing.items.length === 0) {
     return (
       <div className="text-center">
         <h1 className="mb-4 text-2xl font-bold">Today&apos;s Briefing</h1>
