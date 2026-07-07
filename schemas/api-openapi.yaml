@@ -1,0 +1,165 @@
+openapi: 3.1.0
+info:
+  title: DawnBrief API
+  version: 1.0.0
+servers:
+  - url: /api/v1
+paths:
+  /preferences:
+    get:
+      summary: Get current user preferences
+      responses:
+        '200':
+          description: Current preferences
+    put:
+      summary: Update current user preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferencesRequest'
+      responses:
+        '200':
+          description: Updated preferences
+  /briefings:
+    get:
+      summary: List user briefings
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Briefing list
+  /briefings/{briefingId}:
+    get:
+      summary: Get briefing detail
+      parameters:
+        - name: briefingId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Briefing detail
+  /briefings/generate-preview:
+    post:
+      summary: Generate preview briefing for current user
+      responses:
+        '200':
+          description: Preview generated
+  /briefing-items/{itemId}/feedback:
+    post:
+      summary: Submit item feedback
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeedbackRequest'
+      responses:
+        '201':
+          description: Feedback saved
+  /sources:
+    get:
+      summary: List available sources
+      responses:
+        '200':
+          description: Source list
+  /push/subscribe:
+    post:
+      summary: Save web push subscription
+      responses:
+        '201':
+          description: Subscription saved
+    delete:
+      summary: Delete web push subscription
+      responses:
+        '204':
+          description: Subscription deleted
+components:
+  schemas:
+    UpdatePreferencesRequest:
+      type: object
+      required:
+        - timezone
+        - inactiveWindowStart
+        - inactiveWindowEnd
+        - briefingDeliveryTime
+        - briefingMode
+        - categories
+        - interestKeywords
+        - blockedKeywords
+        - emailEnabled
+        - pushEnabled
+      properties:
+        timezone:
+          type: string
+          example: Asia/Seoul
+        inactiveWindowStart:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: '23:30'
+        inactiveWindowEnd:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: '07:00'
+        briefingDeliveryTime:
+          type: string
+          pattern: '^\d{2}:\d{2}$'
+          example: '07:05'
+        briefingMode:
+          type: string
+          enum: [three_minute, ten_minute, full, developer, global]
+        categories:
+          type: array
+          items:
+            type: string
+        interestKeywords:
+          type: array
+          items:
+            type: string
+        blockedKeywords:
+          type: array
+          items:
+            type: string
+        emailEnabled:
+          type: boolean
+        pushEnabled:
+          type: boolean
+    FeedbackRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          enum:
+            - useful
+            - not_useful
+            - duplicate
+            - too_many_like_this
+            - show_more_like_this
+            - block_source
+            - block_keyword
+        note:
+          type: string

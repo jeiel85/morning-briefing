@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BriefingItemOutput",
+  "type": "object",
+  "required": [
+    "title",
+    "category",
+    "status",
+    "summaryBullets",
+    "whyItMatters",
+    "confirmedFacts",
+    "uncertainties",
+    "sources",
+    "rankingExplanation"
+  ],
+  "properties": {
+    "title": { "type": "string", "minLength": 1, "maxLength": 140 },
+    "category": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["confirmed", "developing", "trend_signal", "low_confidence"]
+    },
+    "summaryBullets": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": { "type": "string", "minLength": 1, "maxLength": 280 }
+    },
+    "whyItMatters": { "type": "string", "maxLength": 500 },
+    "confirmedFacts": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "type": "string", "maxLength": 280 }
+    },
+    "uncertainties": {
+      "type": "array",
+      "maxItems": 5,
+      "items": { "type": "string", "maxLength": 280 }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "sourceName"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "sourceName": { "type": "string" },
+          "publishedAt": { "type": "string" }
+        }
+      }
+    },
+    "rankingExplanation": { "type": "string", "maxLength": 500 }
+  },
+  "additionalProperties": false
+}

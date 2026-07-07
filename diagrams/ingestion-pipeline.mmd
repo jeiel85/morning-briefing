@@ -1,0 +1,12 @@
+flowchart LR
+  A[Fetch Window] --> B[Source Fetch]
+  B --> C[Payload Validation]
+  C --> D[Normalize Items]
+  D --> E[Canonicalize URL]
+  E --> F[Classify Language / Category]
+  F --> G[Exact Dedupe]
+  G --> H[Similarity Dedupe]
+  H --> I[Persist Raw Items]
+  I --> J[Build Clusters]
+  J --> K[Score Clusters]
+  K --> L[Ready for Briefing]

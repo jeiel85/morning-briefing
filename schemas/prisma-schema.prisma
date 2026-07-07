@@ -1,0 +1,292 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BriefingMode {
+  three_minute
+  ten_minute
+  full
+  developer
+  global
+}
+
+enum SourceType {
+  rss
+  api
+  status
+  trend
+}
+
+enum FetchRunStatus {
+  pending
+  running
+  success
+  failed
+  partial
+}
+
+enum ClusterStatus {
+  confirmed
+  developing
+  trend_signal
+  low_confidence
+}
+
+enum DeliveryChannel {
+  email
+  web_push
+}
+
+enum DeliveryStatus {
+  pending
+  sent
+  failed
+  skipped
+}
+
+enum FeedbackType {
+  useful
+  not_useful
+  duplicate
+  too_many_like_this
+  show_more_like_this
+  block_source
+  block_keyword
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  name              String?
+  image             String?
+  role              String             @default("user")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  preferences       UserPreference?
+  briefings         Briefing[]
+  feedback          Feedback[]
+  pushSubscriptions PushSubscription[]
+  deliveryLogs      DeliveryLog[]
+}
+
+model UserPreference {
+  id                   String       @id @default(cuid())
+  userId               String       @unique
+  timezone             String       @default("Asia/Seoul")
+  inactiveWindowStart  String       @default("23:30")
+  inactiveWindowEnd    String       @default("07:00")
+  briefingDeliveryTime String       @default("07:05")
+  briefingMode         BriefingMode @default(three_minute)
+  categories           String[]
+  interestKeywords     String[]
+  blockedKeywords      String[]
+  emailEnabled         Boolean      @default(true)
+  pushEnabled          Boolean      @default(false)
+  urgentAlertsEnabled  Boolean      @default(false)
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  user                 User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Source {
+  id                String           @id @default(cuid())
+  key               String           @unique
+  displayName       String
+  sourceType        SourceType
+  url               String?
+  enabled           Boolean          @default(true)
+  defaultCategory   String?
+  defaultLanguage   String?
+  defaultRegion     String?
+  reliabilityScore  Float            @default(0.5)
+  officialSource    Boolean          @default(false)
+  rateLimitPerHour  Int?
+  legalStatus       String           @default("review_required")
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  fetchRuns         SourceFetchRun[]
+  rawItems          RawItem[]
+}
+
+model SourceFetchRun {
+  id              String         @id @default(cuid())
+  sourceId        String
+  status          FetchRunStatus @default(pending)
+  windowStart     DateTime
+  windowEnd       DateTime
+  startedAt       DateTime      @default(now())
+  completedAt     DateTime?
+  fetchedCount    Int           @default(0)
+  normalizedCount Int           @default(0)
+  skippedCount    Int           @default(0)
+  errorCode       String?
+  errorMessage    String?
+  retryCount      Int           @default(0)
+  source          Source        @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, windowStart, windowEnd])
+  @@index([status, startedAt])
+}
+
+model RawItem {
+  id                  String        @id @default(cuid())
+  sourceId            String
+  externalId          String?
+  title               String
+  url                 String
+  canonicalUrl        String?
+  canonicalUrlHash    String?
+  normalizedTitleHash String?
+  sourceName          String
+  publishedAt         DateTime?
+  fetchedAt           DateTime      @default(now())
+  snippet             String?
+  author              String?
+  language            String?
+  region              String?
+  category            String?
+  tags                String[]
+  rawMetadata         Json?
+  createdAt           DateTime      @default(now())
+  source              Source        @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  clusterItems        ClusterItem[]
+
+  @@unique([sourceId, externalId])
+  @@unique([canonicalUrlHash])
+  @@index([publishedAt])
+  @@index([category])
+  @@index([language, region])
+}
+
+model TopicCluster {
+  id                  String        @id @default(cuid())
+  title               String
+  category            String
+  primaryRegion       String?
+  language            String?
+  status              ClusterStatus @default(developing)
+  firstSeenAt         DateTime
+  lastSeenAt          DateTime
+  itemCount           Int           @default(0)
+  sourceCount         Int           @default(0)
+  reliabilityScore    Float         @default(0)
+  urgencyScore        Float         @default(0)
+  trendScore          Float         @default(0)
+  consensusScore      Float         @default(0)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  items               ClusterItem[]
+  briefingItems       BriefingItem[]
+
+  @@index([category, firstSeenAt])
+  @@index([status])
+}
+
+model ClusterItem {
+  id        String       @id @default(cuid())
+  clusterId String
+  rawItemId String
+  weight    Float        @default(1)
+  cluster   TopicCluster @relation(fields: [clusterId], references: [id], onDelete: Cascade)
+  rawItem   RawItem      @relation(fields: [rawItemId], references: [id], onDelete: Cascade)
+
+  @@unique([clusterId, rawItemId])
+}
+
+model Briefing {
+  id           String          @id @default(cuid())
+  userId       String
+  briefingDate DateTime
+  windowStart  DateTime
+  windowEnd    DateTime
+  mode         BriefingMode
+  title        String
+  summary      String?
+  coverageNote String?
+  generatedAt  DateTime        @default(now())
+  createdAt    DateTime        @default(now())
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        BriefingItem[]
+  deliveryLogs DeliveryLog[]
+
+  @@unique([userId, briefingDate, windowStart, windowEnd])
+  @@index([userId, briefingDate])
+}
+
+model BriefingItem {
+  id                 String        @id @default(cuid())
+  briefingId         String
+  clusterId          String
+  section            String
+  rank               Int
+  finalScore         Float
+  title              String
+  status             ClusterStatus
+  summaryBullets     String[]
+  whyItMatters       String?
+  confirmedFacts     String[]
+  uncertainties      String[]
+  sourceLinks        Json
+  rankingExplanation String?
+  promptVersion      String?
+  modelProvider      String?
+  modelName          String?
+  validationStatus   String        @default("valid")
+  createdAt          DateTime      @default(now())
+  briefing           Briefing      @relation(fields: [briefingId], references: [id], onDelete: Cascade)
+  cluster            TopicCluster  @relation(fields: [clusterId], references: [id])
+  feedback           Feedback[]
+
+  @@unique([briefingId, clusterId])
+  @@index([briefingId, section, rank])
+}
+
+model DeliveryLog {
+  id                String          @id @default(cuid())
+  userId            String
+  briefingId        String
+  channel           DeliveryChannel
+  recipient         String
+  status            DeliveryStatus  @default(pending)
+  providerMessageId String?
+  errorCode         String?
+  errorMessage      String?
+  attemptedAt       DateTime        @default(now())
+  deliveredAt       DateTime?
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  briefing          Briefing        @relation(fields: [briefingId], references: [id], onDelete: Cascade)
+
+  @@unique([briefingId, channel, recipient])
+  @@index([status, attemptedAt])
+}
+
+model Feedback {
+  id             String        @id @default(cuid())
+  userId         String
+  briefingItemId String
+  type           FeedbackType
+  note           String?
+  createdAt      DateTime      @default(now())
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  briefingItem   BriefingItem  @relation(fields: [briefingItemId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+  revokedAt  DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

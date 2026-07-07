@@ -1,0 +1,23 @@
+sequenceDiagram
+  participant Cron
+  participant Worker
+  participant DB
+  participant LLM
+  participant Email
+  participant Push
+  participant User
+
+  Cron->>Worker: generate due briefings
+  Worker->>DB: load users due for delivery
+  Worker->>DB: load raw items for inactive window
+  Worker->>Worker: cluster and rank
+  Worker->>LLM: summarize selected clusters
+  LLM-->>Worker: validated JSON candidates
+  Worker->>DB: save briefing and items
+  Worker->>Email: send email briefing
+  Email-->>User: morning briefing email
+  alt push enabled
+    Worker->>Push: send briefing ready notification
+    Push-->>User: web push notification
+  end
+  Worker->>DB: save delivery logs

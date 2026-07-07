@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.local
+.npmrc
+.env.production
+*.tsbuildinfo
+next-env.d.ts
+dist/
+build/
+.turbo/

@@ -1,0 +1,26 @@
+flowchart TD
+  U[User Browser / PWA] --> WEB[Next.js Web App]
+  WEB --> DB[(PostgreSQL)]
+  WEB --> AUTH[Auth.js]
+  WEB --> API[API Routes]
+
+  CRON[Scheduler / Cron] --> Q[Queue]
+  Q --> WORKER[Worker]
+
+  WORKER --> SA[Source Adapters]
+  SA --> RSS[RSS Feeds]
+  SA --> HN[Hacker News API]
+  SA --> GDELT[GDELT]
+  SA --> TRENDS[Trend APIs]
+  SA --> STATUS[Status Pages]
+
+  WORKER --> DB
+  WORKER --> RANK[Ranking Engine]
+  RANK --> SUM[LLM Summarizer]
+  SUM --> VALIDATE[JSON Schema Validation]
+  VALIDATE --> DB
+
+  WORKER --> EMAIL[Email Provider]
+  WORKER --> PUSH[Web Push / FCM]
+
+  DB --> ADMIN[Admin Dashboard]
