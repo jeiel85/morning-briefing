@@ -80,12 +80,18 @@ ${input.items.map((i) => `- ${i.sourceName}: ${i.title}${i.snippet ? ` — ${i.s
 }
 
 function generateFallback(input: SummaryInput): SummaryResult {
-  const bullets = input.items.slice(0, 3).map(
-    (item) => `${item.sourceName}: ${item.title}`,
-  );
+  const bullets = input.items.slice(0, 5).map((item) => {
+    const preview = item.snippet
+      ? item.snippet.replace(/<[^>]*>/g, "").slice(0, 120)
+      : null;
+    return preview
+      ? `${item.sourceName}: ${preview}…`
+      : `${item.sourceName}: ${item.title}`;
+  });
 
   return {
-    summaryBullets: bullets.length > 0 ? bullets : ["No details available"],
+    summaryBullets: bullets,
+    whyItMatters: undefined,
     confirmedFacts: [],
     uncertainties: [],
     validationStatus: "limited",
