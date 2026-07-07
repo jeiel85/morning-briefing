@@ -44,6 +44,25 @@ export async function savePreferences(formData: FormData) {
   revalidatePath("/app/settings");
 }
 
+export async function saveFeedback(briefingItemId: string, type: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  await prisma.feedback.create({
+    data: { userId: session.user.id, briefingItemId, type: type as any },
+  });
+
+  revalidatePath("/app");
+}
+
+export async function deleteAccount() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  await prisma.user.delete({ where: { id: session.user.id } });
+  redirect("/");
+}
+
 export async function getPreferences() {
   const session = await auth();
   if (!session?.user?.id) return null;

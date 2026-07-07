@@ -2,11 +2,19 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { createAdapter } from "@packages/source-adapters/src/registry";
 import { canonicalUrl, urlHash, titleHash } from "@packages/source-adapters/src/normalize";
+import { rateLimit } from "@/lib/rate-limit";
+import { log } from "@/lib/logger";
 
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.INTERNAL_JOB_TOKEN}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const clientIp = request.headers.get("x-forwarded-for") ?? "internal";
+  const { allowed } = rateLimit(`ingestion:${clientIp}`, 10, 60_000);
+  if (!allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const { windowStart, windowEnd } = await request.json().catch(() => ({}));
@@ -105,5 +113,6 @@ export async function POST(request: Request) {
     }
   }
 
+  log("info", "Ingestion fetch completed", { sourcesCount: sources.length, results });
   return NextResponse.json({ windowStart: wStart, windowEnd: wEnd, results });
 }

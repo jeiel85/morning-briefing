@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { generateBriefing } from "@/lib/actions";
+import { generateBriefing, saveFeedback } from "@/lib/actions";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
@@ -114,12 +114,7 @@ export default async function DashboardPage() {
                 <ul className="mt-1 space-y-1">
                   {(item.sourceLinks as Array<{ title: string; url: string; sourceName: string }>).map((link, i) => (
                     <li key={i}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:underline"
-                      >
+                      <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">
                         {link.sourceName}: {link.title}
                       </a>
                     </li>
@@ -127,6 +122,15 @@ export default async function DashboardPage() {
                 </ul>
               </details>
             )}
+            <div className="mt-3 flex gap-2 border-t border-neutral-100 pt-3">
+              {["useful", "not_useful", "duplicate", "block_source"].map((type) => (
+                <form key={type} action={saveFeedback.bind(null, item.id, type)}>
+                  <button type="submit" className="rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800">
+                    {type.replace(/_/g, " ")}
+                  </button>
+                </form>
+              ))}
+            </div>
           </article>
         ))}
       </div>
