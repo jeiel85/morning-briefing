@@ -27,7 +27,12 @@ export async function savePreferences(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const raw = Object.fromEntries(formData);
+  const raw: Record<string, unknown> = {};
+  for (const key of formData.keys()) {
+    const values = formData.getAll(key);
+    raw[key] = values.length > 1 ? values : values[0];
+  }
+
   const parsed = preferencesSchema.parse(raw);
 
   await prisma.userPreference.upsert({
