@@ -14,7 +14,7 @@ export async function getVisitor() {
     if (user) return user;
   }
 
-  const user = await prisma.user.create({ data: { email: null } });
+  const user = await prisma.user.create({ data: {} });
   return user;
 }
 
