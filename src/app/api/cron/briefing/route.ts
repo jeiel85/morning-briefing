@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendPush, renderPushPayload } from "@/lib/push";
+import { isCronRequest } from "@/lib/auth-guard";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -58,9 +59,7 @@ async function sendPushForBriefing(briefingId: string) {
 }
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const token = searchParams.get("token");
-  if (process.env.CRON_SECRET && token !== process.env.CRON_SECRET) {
+  if (!isCronRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

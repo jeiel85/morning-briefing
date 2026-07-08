@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          curl -s -X POST "https://zam-dun.vercel.app/api/ingestion/fetch" \
+          curl -sf -X POST "https://zam-dun.vercel.app/api/ingestion/fetch" \
             -H "Authorization: Bearer ${{ secrets.INTERNAL_JOB_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d "{}"
@@ -21,5 +21,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          curl -s "https://zam-dun.vercel.app/api/maintenance/cleanup" \
+          curl -sf "https://zam-dun.vercel.app/api/maintenance/cleanup" \
             -H "Authorization: Bearer ${{ secrets.INTERNAL_JOB_TOKEN }}"

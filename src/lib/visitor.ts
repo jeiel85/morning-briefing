@@ -29,6 +29,8 @@ export async function ensureVisitor() {
   cookieStore.set(VISITOR_COOKIE, user.id, {
     httpOnly: true,
     sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
     maxAge: COOKIE_MAX_AGE,
   });
   return user;

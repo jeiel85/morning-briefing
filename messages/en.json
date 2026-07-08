@@ -1,12 +1,28 @@
 {
   "landing": {
     "title": "zam-dun",
-    "subtitle": "잠든 사이 — your personal morning briefing.",
-    "start": "Get Started",
+    "eyebrow": "AI morning briefing",
+    "headline_lead": "While you slept,",
+    "headline_emph": "the world moved.",
+    "subtitle": "zam-dun gathers the night's news from sources you trust, distills it with AI, and hands you a calm, three-minute briefing at sunrise.",
+    "start": "Start your briefing",
+    "start_short": "Start",
+    "how": "How it works",
+    "preview_label": "Today · 3-min read",
+    "preview_title": "Your morning, in five stories.",
+    "preview_bullet1": "Curated overnight from the sources you trust.",
+    "preview_bullet2": "Summarized and translated while you slept.",
     "features_title": "Wake up informed",
-    "feature1": "Curated from your favorite RSS sources",
-    "feature2": "AI-powered summary — concise, multilingual",
-    "feature3": "Delivered via push notification on your schedule"
+    "feature1_title": "Your sources, curated",
+    "feature1": "RSS and API feeds you choose — gathered and de-duplicated overnight.",
+    "feature2_title": "Distilled by AI",
+    "feature2": "Concise, factual summaries, translated into your language.",
+    "feature3_title": "Delivered at dawn",
+    "feature3": "A push notification the moment your briefing is ready.",
+    "stat_readers": "readers",
+    "stat_briefings": "briefings delivered",
+    "cta_title": "Sleep well. We'll read the internet.",
+    "cta_sub": "No account, no inbox clutter. Just open it and go."
   },
   "auth": {
     "signin_title": "Sign in to zam-dun",
@@ -27,12 +43,16 @@
   "dashboard": {
     "title": "Today's Briefing",
     "empty": "Your morning digest is ready to brew.",
-    "generate": "Generate Now",
+    "generate": "Generate now",
+    "generating": "Brewing your briefing…",
+    "empty_hint": "Pull tonight's stories into a briefing you can read in three minutes.",
     "items": "{count} items",
     "score": "Score",
     "confidence": "Status: {status}",
     "sources": "Sources ({count})",
     "limited_notice": "This item was summarized without AI. Source text is shown as-is.",
+    "why_matters": "Why it matters",
+    "urgent": "urgent",
     "feedback_useful": "👍",
     "feedback_not_useful": "👎",
     "feedback_duplicate": "duplicate",
@@ -73,7 +93,8 @@
     "save": "Save Settings"
   },
   "sources": {
-    "title": "Source Settings"
+    "title": "Source Settings",
+    "readonly_notice": "Source management is admin-only — you're viewing the current status."
   },
   "delete_account": {
     "title": "Delete Account",
@@ -84,7 +105,7 @@
     "title": "Privacy Policy",
     "content": [
       "zam-dun collects and stores only the data necessary to deliver your morning briefing.",
-      "Account data — email address for login and delivery. Preferences — timezone, schedule, topics, and keyword filters you explicitly set. Briefing data — generated summaries are stored temporarily and linked to your account.",
+      "Account data — an anonymous visitor ID kept in a cookie. No email, no password, no name. Preferences — timezone, schedule, topics, and keyword filters you explicitly set. Briefing data — generated summaries stored and linked to that visitor ID. Push data — if you enable notifications, the browser push subscription needed to deliver them.",
       "We do not sell your data. We do not serve ads. Source content is fetched from public RSS/API feeds and summarized; full article text is not stored.",
       "You can delete your account at any time, which removes all stored data."
     ]
@@ -96,5 +117,10 @@
       "You are responsible for your preferences and for any actions taken based on the briefing.",
       "We reserve the right to discontinue the service at any time. You may delete your account at any time."
     ]
+  },
+  "error": {
+    "title": "Something went wrong",
+    "hint": "That page hit a snag. Try again, or head back to your briefing.",
+    "retry": "Try again"
   }
 }

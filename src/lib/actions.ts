@@ -7,8 +7,10 @@ import { timeStringSchema } from "@/lib/schedule";
 import { buildClusters } from "@/lib/clustering";
 import { calculateScore, calculateFreshness, calculateConsensus, calculateUrgency } from "@/lib/ranking";
 import { generateSummary } from "@/lib/summarizer";
+import { rateLimit } from "@/lib/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { z } from "zod";
 
 const preferencesSchema = z.object({
@@ -71,6 +73,13 @@ export async function getPreferences() {
 
 export async function generateBriefing() {
   const user = await ensureVisitor();
+
+  // Cost control: generation runs clustering + per-cluster LLM calls. Cap bursts
+  // per client IP (visitor IDs are trivially resettable, so key on IP instead).
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+  if (!rateLimit(`generate:${ip}`, 10, 60_000).allowed) {
+    redirect("/app");
+  }
 
   const now = new Date();
   const wStart = new Date(now.getTime() - 12 * 60 * 60 * 1000);

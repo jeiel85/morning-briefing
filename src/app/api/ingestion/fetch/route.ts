@@ -4,10 +4,10 @@ import { createAdapter } from "@packages/source-adapters/src/registry";
 import { canonicalUrl, urlHash, titleHash } from "@packages/source-adapters/src/normalize";
 import { rateLimit } from "@/lib/rate-limit";
 import { log } from "@/lib/logger";
+import { isInternalRequest } from "@/lib/auth-guard";
 
 export async function POST(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.INTERNAL_JOB_TOKEN}`) {
+  if (!isInternalRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

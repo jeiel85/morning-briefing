@@ -1,6 +1,8 @@
 import { getVisitor } from "@/lib/visitor";
 import { prisma } from "@/lib/db";
 import { getTranslations } from "next-intl/server";
+import { History, ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 const PAGE_SIZE = 20;
 
@@ -29,57 +31,74 @@ export default async function HistoryPage(props: { searchParams: Promise<{ page?
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className="animate-fade-in-up">
-      <div className="mb-6 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 text-sm text-white shadow-sm">
-          ◈
-        </div>
-        <h1 className="text-xl font-bold md:text-2xl">{t("title")}</h1>
+    <div className="mx-auto max-w-3xl animate-fade-in-up">
+      <div className="mb-8 flex items-center gap-3.5">
+        <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-aurora-deep to-iris text-white shadow-glow-violet">
+          <History className="h-5 w-5" />
+        </span>
+        <h1 className="font-display text-2xl font-medium md:text-3xl">{t("title")}</h1>
       </div>
 
       {briefings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--border-strong)] py-20 text-center">
           <p className="text-[var(--text-tertiary)]">{t("empty")}</p>
         </div>
       ) : (
         <>
           <div className="space-y-2">
             {briefings.map((b, idx) => (
-              <a
+              <Link
                 key={b.id}
                 href={`/app/briefings/${b.id}`}
-                className="group flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-scale-in"
-                style={{ animationDelay: `${idx * 50}ms` }}
+                className="group flex items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-aurora/40 hover:shadow-lift animate-scale-in"
+                style={{ animationDelay: `${idx * 45}ms` }}
               >
-                <div>
-                  <p className="font-medium text-[var(--text)] transition-colors group-hover:text-violet-700 dark:group-hover:text-violet-400">{b.title}</p>
-                  <p className="text-sm text-[var(--text-secondary)]">
+                <div className="min-w-0">
+                  <p className="truncate font-display text-base font-medium text-[var(--text)] transition-colors group-hover:text-aurora">
+                    {b.title}
+                  </p>
+                  <p className="mt-0.5 font-mono text-[11px] uppercase tracking-wide text-[var(--text-tertiary)]">
                     {b.briefingDate.toLocaleDateString()} · {t("items", { count: b._count.items })}
                   </p>
                 </div>
-                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-[var(--text-secondary)] dark:bg-neutral-800">
-                  {b.mode.replace("_", " ")}
-                </span>
-              </a>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span className="rounded-full bg-[var(--surface-2)] px-3 py-1 font-mono text-[11px] text-[var(--text-secondary)]">
+                    {b.mode.replace(/_/g, " ")}
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 text-[var(--text-tertiary)] transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-aurora" />
+                </div>
+              </Link>
             ))}
           </div>
 
           {totalPages > 1 && (
-            <div className="mt-6 flex items-center justify-center gap-3 text-sm">
+            <div className="mt-8 flex items-center justify-center gap-3 text-sm">
               {page > 1 ? (
-                <a href={`/app/history?page=${page - 1}`} className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-[var(--text-secondary)] transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95 dark:hover:bg-neutral-800 dark:hover:text-violet-400">
-                  ← Prev
-                </a>
+                <Link
+                  href={`/app/history?page=${page - 1}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3.5 py-1.5 text-[var(--text-secondary)] transition-all hover:border-aurora/40 hover:text-aurora active:scale-95"
+                >
+                  <ChevronLeft className="h-4 w-4" /> Prev
+                </Link>
               ) : (
-                <span className="px-3 py-1.5 text-[var(--text-tertiary)]">← Prev</span>
+                <span className="inline-flex items-center gap-1 px-3.5 py-1.5 text-[var(--text-tertiary)] opacity-50">
+                  <ChevronLeft className="h-4 w-4" /> Prev
+                </span>
               )}
-              <span className="text-[var(--text-secondary)]">{page} / {totalPages}</span>
+              <span className="font-mono text-xs text-[var(--text-secondary)]">
+                {page} / {totalPages}
+              </span>
               {page < totalPages ? (
-                <a href={`/app/history?page=${page + 1}`} className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-[var(--text-secondary)] transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95 dark:hover:bg-neutral-800 dark:hover:text-violet-400">
-                  Next →
-                </a>
+                <Link
+                  href={`/app/history?page=${page + 1}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] px-3.5 py-1.5 text-[var(--text-secondary)] transition-all hover:border-aurora/40 hover:text-aurora active:scale-95"
+                >
+                  Next <ChevronRight className="h-4 w-4" />
+                </Link>
               ) : (
-                <span className="px-3 py-1.5 text-[var(--text-tertiary)]">Next →</span>
+                <span className="inline-flex items-center gap-1 px-3.5 py-1.5 text-[var(--text-tertiary)] opacity-50">
+                  Next <ChevronRight className="h-4 w-4" />
+                </span>
               )}
             </div>
           )}

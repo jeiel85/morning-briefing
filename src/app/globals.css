@@ -2,63 +2,196 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ─────────────────────────────────────────────────────────────
+   Dawn Break — design tokens
+   The palette is a sunrise: deep night indigo → aurora violet →
+   dawn rose → rising-sun amber. Fonts encode the brief: a warm
+   optical serif for the human editorial voice, a clean grotesque
+   for reading, a mono for machine-curated data (scores, ranks).
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: var(--font-inter, Inter), "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces, Georgia), "Apple SD Gothic Neo", "Malgun Gothic", Georgia, serif;
+  --font-mono: var(--font-jb, ui-monospace), ui-monospace, "SF Mono", monospace;
+
+  /* Dawn accents — exposed as Tailwind color utilities (bg, text, from, ring) */
+  --color-night: #08060f;
+  --color-dusk: #14122a;
+  --color-aurora: #8b5cf6;
+  --color-aurora-deep: #6d5cf0;
+  --color-iris: #6366f1;
+  --color-rose-dawn: #fb7185;
+  --color-sun: #fbbf24;
+  --color-sun-deep: #f59e0b;
+
+  --shadow-glow-violet: 0 0 0 1px rgba(139, 92, 246, 0.12), 0 8px 30px -8px rgba(124, 92, 240, 0.35);
+  --shadow-lift: 0 1px 2px rgba(20, 16, 40, 0.04), 0 12px 32px -12px rgba(20, 16, 40, 0.12);
+}
+
 @layer base {
   :root {
-    --bg: #FAFAF9;
-    --surface: #FFFFFF;
-    --border: #E4E4E7;
-    --text: #1E293B;
-    --text-secondary: #737373;
-    --text-tertiary: #A1A1AA;
+    --bg: #fbf8f6;
+    --surface: #ffffff;
+    --surface-2: #f6f2fb;
+    --surface-glass: rgba(255, 255, 255, 0.72);
+    --border: #ece7f3;
+    --border-strong: #ddd5ea;
+    --text: #1b1830;
+    --text-secondary: #605a78;
+    --text-tertiary: #9891ae;
+    --ring: rgba(139, 92, 246, 0.45);
   }
 
   .dark {
-    --bg: #0C0C0D;
-    --surface: #18181B;
-    --border: #27272A;
-    --text: #F4F4F5;
-    --text-secondary: #A1A1AA;
-    --text-tertiary: #71717A;
+    --bg: #08060f;
+    --surface: #13111f;
+    --surface-2: #1a1730;
+    --surface-glass: rgba(26, 23, 48, 0.55);
+    --border: #262138;
+    --border-strong: #342c4c;
+    --text: #f5f3fb;
+    --text-secondary: #aba3c4;
+    --text-tertiary: #6e6689;
+    --ring: rgba(139, 92, 246, 0.55);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     background-color: var(--bg);
     color: var(--text);
+    font-family: var(--font-sans);
   }
 
   ::selection {
-    @apply bg-violet-200/50 text-violet-900 dark:bg-violet-800/50 dark:text-violet-100;
+    background: color-mix(in oklab, var(--color-aurora) 28%, transparent);
+    color: var(--text);
+  }
+
+  /* Focus visibility floor — never remove without replacing */
+  :focus-visible {
+    outline: 2px solid var(--color-aurora);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+    border: 3px solid var(--bg);
+  }
+}
+
+@layer components {
+  /* Frosted panel used across app surfaces */
+  .glass {
+    background: var(--surface-glass);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid var(--border);
+  }
+
+  /* The signature: a wordmark that glows like a sunrise */
+  .text-dawn {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-aurora) 0%,
+      var(--color-iris) 28%,
+      var(--color-rose-dawn) 60%,
+      var(--color-sun) 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: dawn-shift 9s ease-in-out infinite;
+  }
+
+  /* A drifting blob of aurora light behind the hero */
+  .aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    will-change: transform;
+    pointer-events: none;
   }
 }
 
 @layer utilities {
-  .animate-fade-in-up {
-    animation: fadeInUp 0.5s ease-out both;
+  /* Entrance animations (existing names kept for compatibility) */
+  .animate-fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-fade-in-up-delay-1 { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both; }
+  .animate-fade-in-up-delay-2 { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both; }
+  .animate-fade-in-up-delay-3 { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both; }
+  .animate-scale-in { animation: scaleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  .animate-float { animation: float 7s ease-in-out infinite; }
+  .animate-breathe { animation: breathe 6s ease-in-out infinite; }
+  .animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 2.4s linear infinite;
   }
 
-  .animate-fade-in-up-delay-1 {
-    animation: fadeInUp 0.5s ease-out 0.1s both;
+  /* Scroll reveal — starts hidden, .is-visible (set by IO) reveals */
+  .reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
   }
-
-  .animate-fade-in-up-delay-2 {
-    animation: fadeInUp 0.5s ease-out 0.2s both;
-  }
-
-  .animate-fade-in-up-delay-3 {
-    animation: fadeInUp 0.5s ease-out 0.3s both;
-  }
-
-  .animate-scale-in {
-    animation: scaleIn 0.3s ease-out both;
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
   }
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+@keyframes dawn-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes float {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(3%, -5%); }
+  66% { transform: translate(-4%, 3%); }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: var(--star-max, 0.9); }
+  50% { opacity: 0.15; }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Accessibility floor: honor reduced-motion by stilling ambient motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }
