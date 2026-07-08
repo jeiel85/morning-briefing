@@ -18,29 +18,13 @@ const CATEGORIES = [
 function formatNextDelivery(timezone: string, deliveryTime: string): string {
   try {
     const now = new Date();
-    const formatter = new Intl.DateTimeFormat("en-CA", {
-      timeZone: timezone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-    const parts = formatter.formatToParts(now);
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(now);
     const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
     const currentLocal = `${get("year")}-${get("month")}-${get("day")}T${deliveryTime}:00`;
     const next = new Date(currentLocal);
     if (next <= now) next.setDate(next.getDate() + 1);
-    return next.toLocaleString(undefined, {
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: timezone,
-    });
-  } catch {
-    return deliveryTime;
-  }
+    return next.toLocaleString(undefined, { weekday: "short", hour: "2-digit", minute: "2-digit", timeZone: timezone });
+  } catch { return deliveryTime; }
 }
 
 export default async function SettingsPage() {
@@ -52,104 +36,101 @@ export default async function SettingsPage() {
     prisma.pushSubscription.count({ where: { userId: user.id, revokedAt: null } }),
   ]);
 
-  const displayTime = prefs
-    ? formatNextDelivery(prefs.timezone, prefs.briefingDeliveryTime)
-    : null;
+  const displayTime = prefs ? formatNextDelivery(prefs.timezone, prefs.briefingDeliveryTime) : null;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="mb-8 text-2xl font-bold">{t("title")}</h1>
+    <div className="mx-auto max-w-2xl animate-fade-in-up">
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 text-sm text-white shadow-sm">◎</div>
+        <h1 className="text-xl font-bold md:text-2xl">{t("title")}</h1>
+      </div>
 
-      <form action={savePreferences} className="space-y-8">
-        <section className="rounded-lg border border-neutral-200 p-6">
-          <h2 className="mb-4 text-lg font-semibold">{t("schedule")}</h2>
+      <form action={savePreferences} className="space-y-6">
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm md:p-6">
+          <h2 className="mb-4 text-base font-semibold">{t("schedule")}</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("timezone")}</label>
-              <select name="timezone" defaultValue={prefs?.timezone ?? "Asia/Seoul"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm">
-                {TIMEZONES.map((tz) => (
-                  <option key={tz} value={tz}>{tz}</option>
-                ))}
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("timezone")}</label>
+              <select name="timezone" defaultValue={prefs?.timezone ?? "Asia/Seoul"} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400">
+                {TIMEZONES.map((tz) => (<option key={tz} value={tz}>{tz}</option>))}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("inactive_start")}</label>
-              <input type="time" name="inactiveWindowStart" defaultValue={prefs?.inactiveWindowStart ?? "23:30"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("delivery_time")}</label>
+              <input type="time" name="briefingDeliveryTime" defaultValue={prefs?.briefingDeliveryTime ?? "07:05"} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("inactive_end")}</label>
-              <input type="time" name="inactiveWindowEnd" defaultValue={prefs?.inactiveWindowEnd ?? "07:00"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("inactive_start")}</label>
+              <input type="time" name="inactiveWindowStart" defaultValue={prefs?.inactiveWindowStart ?? "23:30"} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("delivery_time")}</label>
-              <input type="time" name="briefingDeliveryTime" defaultValue={prefs?.briefingDeliveryTime ?? "07:05"} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("inactive_end")}</label>
+              <input type="time" name="inactiveWindowEnd" defaultValue={prefs?.inactiveWindowEnd ?? "07:00"} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400" />
             </div>
           </div>
-          {displayTime && (
-            <p className="mt-3 text-xs text-neutral-500">{t("next_delivery", { time: displayTime })}</p>
-          )}
+          {displayTime && <p className="mt-3 text-xs text-neutral-400">{t("next_delivery", { time: displayTime })}</p>}
         </section>
 
-        <section className="rounded-lg border border-neutral-200 p-6">
-          <h2 className="mb-4 text-lg font-semibold">{t("briefing_mode")}</h2>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm md:p-6">
+          <h2 className="mb-4 text-base font-semibold">{t("briefing_mode")}</h2>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {(["three_minute", "ten_minute", "full", "developer", "global"] as const).map((mode) => (
-              <label key={mode} className="flex items-center gap-2 rounded border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50">
-                <input type="radio" name="briefingMode" value={mode} defaultChecked={(prefs?.briefingMode ?? "three_minute") === mode} />
+              <label key={mode} className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 px-3 py-2.5 text-sm transition-all hover:border-violet-200 hover:bg-violet-50 has-checked:border-violet-400 has-checked:bg-violet-50">
+                <input type="radio" name="briefingMode" value={mode} defaultChecked={(prefs?.briefingMode ?? "three_minute") === mode} className="text-violet-600 accent-violet-600" />
                 {t(`mode_${mode}`)}
               </label>
             ))}
           </div>
         </section>
 
-        <section className="rounded-lg border border-neutral-200 p-6">
-          <h2 className="mb-4 text-lg font-semibold">{t("topics")}</h2>
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm md:p-6">
+          <h2 className="mb-4 text-base font-semibold">{t("topics")}</h2>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
-              <label key={cat} className="flex items-center gap-2 rounded border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50">
-                <input type="checkbox" name="categories" value={cat} defaultChecked={prefs?.categories.includes(cat) ?? true} />
+              <label key={cat} className="flex cursor-pointer items-center gap-2 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm transition-all hover:border-violet-200 hover:bg-violet-50 has-checked:border-violet-400 has-checked:bg-violet-50">
+                <input type="checkbox" name="categories" value={cat} defaultChecked={prefs?.categories.includes(cat) ?? true} className="text-violet-600 accent-violet-600" />
                 {cat.replace("_", " ")}
               </label>
             ))}
           </div>
         </section>
 
-        <section className="rounded-lg border border-neutral-200 p-6">
-          <h2 className="mb-4 text-lg font-semibold">{t("keywords")}</h2>
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm md:p-6">
+          <h2 className="mb-4 text-base font-semibold">{t("keywords")}</h2>
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("interest_keywords")}</label>
-              <input type="text" name="interestKeywords" defaultValue={prefs?.interestKeywords.join(", ") ?? ""} placeholder={t("interest_placeholder")} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("interest_keywords")}</label>
+              <input type="text" name="interestKeywords" defaultValue={prefs?.interestKeywords.join(", ") ?? ""} placeholder={t("interest_placeholder")} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400" />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium">{t("blocked_keywords")}</label>
-              <input type="text" name="blockedKeywords" defaultValue={prefs?.blockedKeywords.join(", ") ?? ""} placeholder={t("blocked_placeholder")} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
+              <label className="mb-1.5 block text-sm font-medium text-neutral-700">{t("blocked_keywords")}</label>
+              <input type="text" name="blockedKeywords" defaultValue={prefs?.blockedKeywords.join(", ") ?? ""} placeholder={t("blocked_placeholder")} className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors focus:border-violet-400 focus:outline-none focus:ring-1 focus:ring-violet-400" />
             </div>
           </div>
         </section>
 
-        <section className="rounded-lg border border-neutral-200 p-6">
-          <h2 className="mb-4 text-lg font-semibold">{t("delivery")}</h2>
+        <section className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm md:p-6">
+          <h2 className="mb-4 text-base font-semibold">{t("delivery")}</h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between rounded bg-neutral-50 px-3 py-2">
-              <span className="text-sm">{t("push_status")}</span>
+            <div className="flex items-center justify-between rounded-lg border border-neutral-100 bg-neutral-50 px-4 py-2.5">
+              <span className="text-sm text-neutral-700">{t("push_status")}</span>
               <span className={`text-xs font-medium ${pushCount > 0 ? "text-green-600" : "text-neutral-400"}`}>
                 {pushCount > 0 ? t("push_subscribed") : t("push_not_subscribed")}
               </span>
             </div>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" name="pushEnabled" defaultChecked={prefs?.pushEnabled ?? false} />
-              <span className="text-sm">{t("push_enabled")}</span>
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 px-4 py-2.5 text-sm transition-all hover:border-violet-200">
+              <input type="checkbox" name="pushEnabled" defaultChecked={prefs?.pushEnabled ?? false} className="text-violet-600 accent-violet-600" />
+              {t("push_enabled")}
             </label>
-            <label className="flex items-center gap-2">
-              <input type="checkbox" name="urgentAlertsEnabled" defaultChecked={prefs?.urgentAlertsEnabled ?? false} />
-              <span className="text-sm">{t("urgent_enabled")}</span>
+            <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-neutral-200 px-4 py-2.5 text-sm transition-all hover:border-violet-200">
+              <input type="checkbox" name="urgentAlertsEnabled" defaultChecked={prefs?.urgentAlertsEnabled ?? false} className="text-violet-600 accent-violet-600" />
+              {t("urgent_enabled")}
             </label>
           </div>
         </section>
 
         <div className="text-right">
-          <button type="submit" className="rounded-lg bg-neutral-900 px-6 py-2 text-sm text-white hover:bg-neutral-800">
+          <button type="submit" className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:shadow-md hover:shadow-violet-200 active:scale-95">
             {t("save")}
           </button>
         </div>

@@ -16,49 +16,55 @@ function ScoreBadge({ score }: { score: number }) {
   return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${color}`}>{(score * 100).toFixed(0)}%</span>;
 }
 
-function ToggleSwitch({ enabled }: { enabled: boolean }) {
+function ToggleBtn({ enabled }: { enabled: boolean }) {
   return (
     <button
       type="submit"
-      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${enabled ? "bg-green-500" : "bg-neutral-300"}`}
+      className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors ${enabled ? "bg-violet-500" : "bg-neutral-200"}`}
     >
-      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${enabled ? "translate-x-4.5" : "translate-x-1"}`} style={{ translate: enabled ? "18px" : "4px" }} />
+      <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${enabled ? "translate-x-5" : "translate-x-1"}`} />
     </button>
   );
 }
 
 export default async function SourcesPage() {
-  const user = await getVisitor();
+  await getVisitor();
   const t = await getTranslations("sources");
 
   const sources = await prisma.source.findMany({
     orderBy: { key: "asc" },
-    include: {
-      fetchRuns: { take: 1, orderBy: { startedAt: "desc" } },
-    },
+    include: { fetchRuns: { take: 1, orderBy: { startedAt: "desc" } } },
   });
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="mb-8 text-2xl font-bold">{t("title")}</h1>
+    <div className="mx-auto max-w-2xl animate-fade-in-up">
+      <div className="mb-6 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 text-sm text-white shadow-sm">◉</div>
+        <h1 className="text-xl font-bold md:text-2xl">{t("title")}</h1>
+      </div>
       <div className="space-y-2">
-        {sources.map((source) => {
+        {sources.map((source, idx) => {
           const lastRun = source.fetchRuns[0];
           return (
-            <form key={source.id} action={toggleSource} className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3">
+            <form
+              key={source.id}
+              action={toggleSource}
+              className="group flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-3.5 shadow-sm transition-all hover:shadow-md animate-scale-in"
+              style={{ animationDelay: `${idx * 50}ms` }}
+            >
               <input type="hidden" name="sourceId" value={source.id} />
               <input type="hidden" name="enabled" value={String(!source.enabled)} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate font-medium">{source.displayName}</p>
+                  <p className="truncate font-medium text-neutral-900">{source.displayName}</p>
                   <ScoreBadge score={source.reliabilityScore} />
                 </div>
-                <p className="truncate text-xs text-neutral-500">
+                <p className="truncate text-xs text-neutral-400">
                   {source.sourceType} · {source.defaultCategory ?? "general"}
-                  {lastRun && ` · last: ${lastRun.startedAt.toLocaleDateString()}`}
+                  {lastRun && ` · last ${lastRun.startedAt.toLocaleDateString()}`}
                 </p>
               </div>
-              <ToggleSwitch enabled={source.enabled} />
+              <ToggleBtn enabled={source.enabled} />
             </form>
           );
         })}
