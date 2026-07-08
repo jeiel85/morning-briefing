@@ -12,7 +12,7 @@ async function toggleSource(formData: FormData) {
 }
 
 function ScoreBadge({ score }: { score: number }) {
-  const color = score >= 0.8 ? "bg-green-100 text-green-700" : score >= 0.5 ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700";
+  const color = score >= 0.8 ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400" : score >= 0.5 ? "bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400" : "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400";
   return <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${color}`}>{(score * 100).toFixed(0)}%</span>;
 }
 
@@ -20,7 +20,7 @@ function ToggleBtn({ enabled }: { enabled: boolean }) {
   return (
     <button
       type="submit"
-      className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors ${enabled ? "bg-violet-500" : "bg-neutral-200"}`}
+      className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors ${enabled ? "bg-violet-500" : "bg-neutral-200 dark:bg-neutral-700"}`}
     >
       <span className={`inline-block h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${enabled ? "translate-x-5" : "translate-x-1"}`} />
     </button>
@@ -49,17 +49,17 @@ export default async function SourcesPage() {
             <form
               key={source.id}
               action={toggleSource}
-              className="group flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-3.5 shadow-sm transition-all hover:shadow-md animate-scale-in"
+              className="group flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-3.5 shadow-sm transition-all hover:shadow-md animate-scale-in"
               style={{ animationDelay: `${idx * 50}ms` }}
             >
               <input type="hidden" name="sourceId" value={source.id} />
               <input type="hidden" name="enabled" value={String(!source.enabled)} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="truncate font-medium text-neutral-900">{source.displayName}</p>
+                  <p className="truncate font-medium text-[var(--text)]">{source.displayName}</p>
                   <ScoreBadge score={source.reliabilityScore} />
                 </div>
-                <p className="truncate text-xs text-neutral-400">
+                <p className="truncate text-xs text-[var(--text-tertiary)]">
                   {source.sourceType} · {source.defaultCategory ?? "general"}
                   {lastRun && ` · last ${lastRun.startedAt.toLocaleDateString()}`}
                 </p>

@@ -11,7 +11,7 @@ export function GenerateButton({ label }: { label: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3 text-sm font-medium text-white shadow-lg shadow-violet-200 transition-all hover:shadow-xl hover:shadow-violet-300 active:scale-95 disabled:opacity-50 disabled:shadow-none"
+        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-500 px-8 py-3 text-sm font-medium text-white shadow-lg shadow-violet-200 transition-all hover:shadow-xl hover:shadow-violet-300 active:scale-95 disabled:opacity-50 disabled:shadow-none dark:shadow-violet-950/50 dark:hover:shadow-violet-950/70"
       >
         {pending ? (
           <>

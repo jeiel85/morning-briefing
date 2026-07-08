@@ -39,7 +39,7 @@ export default async function HistoryPage(props: { searchParams: Promise<{ page?
 
       {briefings.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <p className="text-neutral-500">{t("empty")}</p>
+          <p className="text-[var(--text-tertiary)]">{t("empty")}</p>
         </div>
       ) : (
         <>
@@ -48,16 +48,16 @@ export default async function HistoryPage(props: { searchParams: Promise<{ page?
               <a
                 key={b.id}
                 href={`/app/briefings/${b.id}`}
-                className="group flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-scale-in"
+                className="group flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md animate-scale-in"
                 style={{ animationDelay: `${idx * 50}ms` }}
               >
                 <div>
-                  <p className="font-medium text-neutral-900 transition-colors group-hover:text-violet-700">{b.title}</p>
-                  <p className="text-sm text-neutral-500">
+                  <p className="font-medium text-[var(--text)] transition-colors group-hover:text-violet-700 dark:group-hover:text-violet-400">{b.title}</p>
+                  <p className="text-sm text-[var(--text-secondary)]">
                     {b.briefingDate.toLocaleDateString()} · {t("items", { count: b._count.items })}
                   </p>
                 </div>
-                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-500">
+                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs text-[var(--text-secondary)] dark:bg-neutral-800">
                   {b.mode.replace("_", " ")}
                 </span>
               </a>
@@ -67,19 +67,19 @@ export default async function HistoryPage(props: { searchParams: Promise<{ page?
           {totalPages > 1 && (
             <div className="mt-6 flex items-center justify-center gap-3 text-sm">
               {page > 1 ? (
-                <a href={`/app/history?page=${page - 1}`} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-neutral-600 transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95">
+                <a href={`/app/history?page=${page - 1}`} className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-[var(--text-secondary)] transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95 dark:hover:bg-neutral-800 dark:hover:text-violet-400">
                   ← Prev
                 </a>
               ) : (
-                <span className="px-3 py-1.5 text-neutral-300">← Prev</span>
+                <span className="px-3 py-1.5 text-[var(--text-tertiary)]">← Prev</span>
               )}
-              <span className="text-neutral-500">{page} / {totalPages}</span>
+              <span className="text-[var(--text-secondary)]">{page} / {totalPages}</span>
               {page < totalPages ? (
-                <a href={`/app/history?page=${page + 1}`} className="rounded-lg border border-neutral-200 px-3 py-1.5 text-neutral-600 transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95">
+                <a href={`/app/history?page=${page + 1}`} className="rounded-lg border border-[var(--border)] px-3 py-1.5 text-[var(--text-secondary)] transition-all hover:bg-neutral-50 hover:text-violet-700 active:scale-95 dark:hover:bg-neutral-800 dark:hover:text-violet-400">
                   Next →
                 </a>
               ) : (
-                <span className="px-3 py-1.5 text-neutral-300">Next →</span>
+                <span className="px-3 py-1.5 text-[var(--text-tertiary)]">Next →</span>
               )}
             </div>
           )}
