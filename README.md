@@ -18,6 +18,13 @@
 | **개인화** | 관심/차단 키워드, 시간대, 브리핑 모드 설정 |
 | **다국어** | 한국어/영어 UI (next-intl) |
 
+## 아키텍처
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/architecture-dark.png">
+  <img src="docs/architecture.png" width="810" alt="zam-dun 아키텍처. 사용자(브라우저·PWA)가 HTTPS로 Vercel의 Next.js 앱·API 라우트에 접속한다. Vercel Cron이 매일 07:00 KST에 Next.js를 호출하면 Next.js가 Web Push(VAPID·서비스 워커)로 브리핑을 발송해 사용자에게 알림이 간다. GitHub Actions는 4시간마다(시간대별 추가 실행 포함) Next.js의 수집 라우트를 호출한다. Next.js는 뉴스 피드(RSS·HN API)에서 수집하고, Prisma로 Neon(Postgres)에 저장하며, OpenAI gpt-4o-mini로 요약하고(선택), 키가 없으면 Google Translate로 한글 번역해 폴백한다.">
+</picture>
+
 ## 기술 스택
 
 ```
